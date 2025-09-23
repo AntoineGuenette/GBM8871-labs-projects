@@ -29,32 +29,16 @@ Q_0 = Q_1 + Q_3 + Q_4
 ###################################
 
 # Choix des largeurs (en mètres)
-w_1 = 500e-6
-w_2 = 500e-6
-w_3 = 500e-6
-w_4 = 500e-6
+w = 500e-6
 
-# Choix d'une longueur de base pour L_3 (en mètres)
-L_3 = 0.01 # Ce sera la longueur de canal la plus courte
+# Choix des longueurs (en mètres)
+L_0 = 0.02
+L_3 = 0.01 # Ce sera la plus courte longueur
 
-###################################
-# Calcul des résistances du montage
-###################################
+#####################################
+# FONCTIONS DE CALCUL DES RÉSISTANCES
+#####################################
 
-R_t = 8 * eta * L_t / (np.pi * r_t**4)
-R_c = 8 * eta * L_c / (np.pi * r_c**4)
-
-R_in = R_t
-R_out = R_t + R_c
-
-# print(f"\nRésistance d'entrée : {R_in:.2e}")
-# print(f"Résistance de sortie : {R_out:.2e}")
-
-###################################
-# Calcul des résistances du routeur
-###################################
-
-# On calcule R_3 avec L_3 choisi
 def calc_R_rect(L, w, h, eta):
     R_rect = (12 * eta * L) / (h**3 * w)
     for n_i in range(1, 10, 2):
@@ -62,22 +46,51 @@ def calc_R_rect(L, w, h, eta):
         R_rect -= terme_somme
     return R_rect
 
-R_3 = calc_R_rect(L_3, w_3, h, eta)
+def calc_L(R, w, h, eta):
+    L = (R * h**3 * w) / (12 * eta)
+    # Les termes de la somme sont négligés pour l'inversion
+    return L
+
+###################################
+# Calcul des résistances du montage
+###################################
+
+R_t = 8 * eta * L_t / (np.pi * r_t**4)
+R_c = 8 * eta * L_c / (np.pi * r_c**4)
+R_0 = calc_R_rect(L_0, w, h, eta)
+
+R_in = R_t + R_0
+R_out = R_t + R_c
+
+print(f"\nRésistance d'entrée : {R_in:.2e}")
+print(f"Résistance de sortie : {R_out:.2e}")
+
+###################################
+# Calcul des résistances du routeur
+###################################
+
+# On calcule R_3 avec L_3 choisi
+R_3 = calc_R_rect(L_3, w, h, eta)
+
+# Relations à respecter :
+# R_1 = 3*R_3 + 2*R_out
+# R_4 = R_2 + 3/4*R_3 - 1/4*R_out
 
 # Calcul de L_1 pour respecter la première relation
-R_1 = 3 * R_3 + 2 * (8 * eta * L_t / (np.pi * r_t**4) + 8 * eta * L_c / (np.pi * r_c**4))
+R_1 = 3 * R_3 + 2 * R_out
 # Inversion de calc_R_rect pour L_1
-L_1 = (R_1 * h**3 * w_1) / (12 * eta)
+# (Les termnes de la somme sont négligés pour l'inversion)
+L_1 = calc_L(R_1, w, h, eta)
 
-# Calcul de L_2 pour respecter la deuxième relation
-# R_4 = R_2 + 3/4*R_3 - 1/4*R_out
-# Donc R_2 = R_4 - 3/4*R_3 + 1/4*R_out
-# On choisit L_4 = L_1 (pour garder les canaux symétriques)
-L_4 = L_1
-R_4 = calc_R_rect(L_4, w_4, h, eta)
-R_out = 8 * eta * L_t / (np.pi * r_t**4) + 8 * eta * L_c / (np.pi * r_c**4)
-R_2 = R_4 - 3/4 * R_3 + 1/4 * R_out
-L_2 = (R_2 * h**3 * w_2) / (12 * eta)
+# Calcul de L_4 pour respecter la deuxième relation
+# On choisit L_2 = L_3
+L_2 = L_3
+# On calcule R_2 avec L_2 choisi
+R_2 = calc_R_rect(L_2, w, h, eta)
+# On calcule L_4 pour respecter la deuxième relation
+R_4 = R_2 + 3/4 * R_3 - 1/4 * R_out
+# Inversion de calc_R_rect pour L_4
+L_4 = calc_L(R_4, w, h, eta)
 
 #########################
 # Affichage des résultats
