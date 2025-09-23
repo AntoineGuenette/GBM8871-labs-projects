@@ -66,9 +66,6 @@ R_0 = calc_R_rect(L_0, w, h, eta)
 R_in = R_t + R_0
 R_out = R_t + R_c
 
-print(f"\nRésistance d'entrée : {R_in:.2e}")
-print(f"Résistance de sortie : {R_out:.2e}")
-
 ###################################
 # Calcul des résistances du routeur
 ###################################
@@ -99,6 +96,9 @@ L_4 = calc_L(R_4, w, h, eta)
 #########################
 # Affichage des résultats
 #########################
+
+print(f"\nRésistance d'entrée : {R_in:.2e}")
+print(f"Résistance de sortie : {R_out:.2e}")
 
 print(f"\nRésistance 1 : {R_1:.2e}")
 print(f"Résistance 2 : {R_2:.2e}")
