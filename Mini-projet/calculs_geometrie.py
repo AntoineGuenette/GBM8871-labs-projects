@@ -37,7 +37,9 @@ w_3 = 3 * w
 w_4 = 4 * w
 
 # Choix de la longueur de l'entrée du routeur (en mètres)
-L_0 = 0.002
+L_0 = 0.004
+L_2 = 0.004
+L_3 = 0.008
 
 #####################################
 # FONCTIONS DE CALCUL DES RÉSISTANCES
@@ -74,10 +76,6 @@ R_out = R_t + R_c
 # Calcul des résistances du routeur
 ###################################
 
-# On veut que les canaux aient une longueur 10x plus grande que leur largeur
-# pour minimiser les effets de coins
-L_3 = 10 * w_3
-
 # On calcule R_3 avec L_3 choisi
 R_3 = calc_R_rect(L_3, w_3, h, eta)
 
@@ -92,8 +90,6 @@ R_1 = 3 * R_3 + 2 * R_out
 L_1 = calc_L(R_1, w_1, h, eta)
 
 # Calcul de L_4 pour respecter la deuxième relation
-# On choisit L_2 = L_3
-L_2 = L_3
 # On calcule R_2 avec L_2 choisi
 R_2 = calc_R_rect(L_2, w_2, h, eta)
 # On calcule L_4 pour respecter la deuxième relation
