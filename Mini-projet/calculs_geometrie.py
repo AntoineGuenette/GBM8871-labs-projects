@@ -39,6 +39,10 @@ L_3 = 0.01 # Ce sera la plus courte longueur
 # FONCTIONS DE CALCUL DES RÉSISTANCES
 #####################################
 
+def calc_R_cyl(L, r, eta):
+    R_cyl = (8 * eta * L) / (np.pi * r**4)
+    return R_cyl
+
 def calc_R_rect(L, w, h, eta):
     R_rect = (12 * eta * L) / (h**3 * w)
     for n_i in range(1, 10, 2):
@@ -55,8 +59,8 @@ def calc_L(R, w, h, eta):
 # Calcul des résistances du montage
 ###################################
 
-R_t = 8 * eta * L_t / (np.pi * r_t**4)
-R_c = 8 * eta * L_c / (np.pi * r_c**4)
+R_t = calc_R_cyl(L_t, r_t, eta)
+R_c = calc_R_cyl(L_c, r_c, eta)
 R_0 = calc_R_rect(L_0, w, h, eta)
 
 R_in = R_t + R_0
