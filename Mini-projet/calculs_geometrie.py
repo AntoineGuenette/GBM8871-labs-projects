@@ -30,10 +30,14 @@ Q_0 = Q_1 + Q_3 + Q_4
 
 # Choix des largeurs (en mètres)
 w = 500e-6
+w_0 = 4 * w
+w_1 = w
+w_2 = 4 * w
+w_3 = 3 * w
+w_4 = 4 * w
 
-# Choix des longueurs (en mètres)
-L_0 = 0.02
-L_3 = 0.01 # Ce sera la plus courte longueur
+# Choix de la longueur de l'entrée du routeur (en mètres)
+L_0 = 0.002
 
 #####################################
 # FONCTIONS DE CALCUL DES RÉSISTANCES
@@ -61,7 +65,7 @@ def calc_L(R, w, h, eta):
 
 R_t = calc_R_cyl(L_t, r_t, eta)
 R_c = calc_R_cyl(L_c, r_c, eta)
-R_0 = calc_R_rect(L_0, w, h, eta)
+R_0 = calc_R_rect(L_0, w_0, h, eta)
 
 R_in = R_t + R_0
 R_out = R_t + R_c
@@ -70,8 +74,12 @@ R_out = R_t + R_c
 # Calcul des résistances du routeur
 ###################################
 
+# On veut que les canaux aient une longueur 10x plus grande que leur largeur
+# pour minimiser les effets de coins
+L_3 = 10 * w_3
+
 # On calcule R_3 avec L_3 choisi
-R_3 = calc_R_rect(L_3, w, h, eta)
+R_3 = calc_R_rect(L_3, w_3, h, eta)
 
 # Relations à respecter :
 # R_1 = 3*R_3 + 2*R_out
@@ -81,17 +89,17 @@ R_3 = calc_R_rect(L_3, w, h, eta)
 R_1 = 3 * R_3 + 2 * R_out
 # Inversion de calc_R_rect pour L_1
 # (Les termnes de la somme sont négligés pour l'inversion)
-L_1 = calc_L(R_1, w, h, eta)
+L_1 = calc_L(R_1, w_1, h, eta)
 
 # Calcul de L_4 pour respecter la deuxième relation
 # On choisit L_2 = L_3
 L_2 = L_3
 # On calcule R_2 avec L_2 choisi
-R_2 = calc_R_rect(L_2, w, h, eta)
+R_2 = calc_R_rect(L_2, w_2, h, eta)
 # On calcule L_4 pour respecter la deuxième relation
 R_4 = R_2 + 3/4 * R_3 - 1/4 * R_out
 # Inversion de calc_R_rect pour L_4
-L_4 = calc_L(R_4, w, h, eta)
+L_4 = calc_L(R_4, w_4, h, eta)
 
 #########################
 # Affichage des résultats
