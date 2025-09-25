@@ -6,6 +6,7 @@ import numpy as np
 
 # Paramètre physique de l'eau à 20°C
 eta = 8.94e-4
+rho = 1000
 
 # Paramètres géométriques des canaux rectangulaires
 h = 250e-6
@@ -16,7 +17,7 @@ r_t = 7.5e-4
 
 # Paramètres géométriques des capillaires
 L_c = 0.127
-r_c = 6.515e-4
+r_c = 6.515e-4 
 
 # Débits
 Q_1 = (100/60) * 1e-9
@@ -65,6 +66,19 @@ def calc_L(R, w, h, eta):
         somme -= terme_somme
     return L * somme
 
+##########################################################
+# Fontions de calcul des vitesses et du nombre de Reynolds
+##########################################################
+
+def calc_v(Q, w, h):
+    A = w * h
+    v = Q / A
+    return v
+
+def calc_Re(v, h, L, eta, rho):
+    Re = (rho * v * h**2) / (eta * L)
+    return Re
+
 ###################################
 # Calcul des résistances du montage
 ###################################
@@ -100,6 +114,18 @@ R_2 = R_4 - 3/4 * R_3 + 1/4 * R_out
 # Inversion de calc_R_rect pour L_2
 L_2 = calc_L(R_2, w_2, h, eta)
 
+############################################
+# Caclul des vitesses et nombres de Reynolds
+############################################
+
+v_in = calc_v(Q_0, w_0, h)
+v_out = v_in * (w_0 / (w_1 + w_3 + w_4))
+
+Re_in = calc_Re(v_in, h, L_0, eta, rho)
+Re_out_1 = calc_Re(v_out, h, L_1, eta, rho)
+Re_out_3 = calc_Re(v_out, h, L_3, eta, rho)
+Re_out_4 = calc_Re(v_out, h, L_4, eta, rho)
+
 #########################
 # Affichage des résultats
 #########################
@@ -123,15 +149,12 @@ print(f"valeur de droite : {R_2 + 3/4 * R_3 - 1/4 * R_out:.2e}")
 print(f"\nLongueur 1 : {L_1*1e3:.2f} mm")
 print(f"Longueur 2 : {L_2*1e3:.2f} mm")
 print(f"Longueur 3 : {L_3*1e3:.2f} mm")
-print(f"Longueur 4 : {L_4*1e3:.2f} mm\n")
+print(f"Longueur 4 : {L_4*1e3:.2f} mm")
 
-# Vérification des ratios L_i / w_i > 10
-ratios = {
-    "L_1/w_1": L_1 / w_1,
-    "L_3/w_3": L_3 / w_3,
-    "L_4/w_4": L_4 / w_4,
-}
+print(f"\nVitesse entrée : {v_in:.2e} m/s")
+print(f"Vitesse sortie : {v_out:.2e} m/s")
 
-print("Vérification des ratios L_i / w_i >= 10 :")
-for key, value in ratios.items():
-    print(f"{key} = {value:.2f} {'OK' if value >= 10 else 'NON'}")
+print(f"\nNombre de Reynolds entrée : {Re_in:.2e}")
+print(f"Nombre de Reynolds sortie 1 : {Re_out_1:.2e}")
+print(f"Nombre de Reynolds sortie 3 : {Re_out_3:.2e}")
+print(f"Nombre de Reynolds sortie 4 : {Re_out_4:.2e}\n")
