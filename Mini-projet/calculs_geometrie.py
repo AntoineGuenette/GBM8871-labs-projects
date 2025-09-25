@@ -38,8 +38,8 @@ w_4 = 4 * w
 
 # Choix de la longueur de l'entrée du routeur (en mètres)
 L_0 = 0.004
-L_2 = 0.004
-L_3 = 0.008
+L_3 = 10 * w_3
+L_4 = 10 * w_4
 
 #####################################
 # FONCTIONS DE CALCUL DES RÉSISTANCES
@@ -51,15 +51,19 @@ def calc_R_cyl(L, r, eta):
 
 def calc_R_rect(L, w, h, eta):
     R_rect = (12 * eta * L) / (h**3 * w)
+    somme = 1
     for n_i in range(1, 10, 2):
         terme_somme = (192 * h) / (np.pi**5 * n_i**5 * w) * np.tanh(n_i * np.pi * w / (2 * h))
-        R_rect -= terme_somme
-    return R_rect
+        somme -= terme_somme
+    return R_rect / somme
 
 def calc_L(R, w, h, eta):
     L = (R * h**3 * w) / (12 * eta)
-    # Les termes de la somme sont négligés pour l'inversion
-    return L
+    somme = 1
+    for n_i in range(1, 10, 2):
+        terme_somme = (192 * h) / (np.pi**5 * n_i**5 * w) * np.tanh(n_i * np.pi * w / (2 * h))
+        somme -= terme_somme
+    return L * somme
 
 ###################################
 # Calcul des résistances du montage
@@ -89,13 +93,12 @@ R_1 = 3 * R_3 + 2 * R_out
 # (Les termnes de la somme sont négligés pour l'inversion)
 L_1 = calc_L(R_1, w_1, h, eta)
 
-# Calcul de L_4 pour respecter la deuxième relation
-# On calcule R_2 avec L_2 choisi
-R_2 = calc_R_rect(L_2, w_2, h, eta)
-# On calcule L_4 pour respecter la deuxième relation
-R_4 = R_2 + 3/4 * R_3 - 1/4 * R_out
-# Inversion de calc_R_rect pour L_4
-L_4 = calc_L(R_4, w_4, h, eta)
+# Calcul de L_2 pour respecter la deuxième relation, en utilisant L_4 choisi
+R_4 = calc_R_rect(L_4, w_4, h, eta)
+# On calcule R_2 pour respecter la deuxième relation
+R_2 = R_4 - 3/4 * R_3 + 1/4 * R_out
+# Inversion de calc_R_rect pour L_2
+L_2 = calc_L(R_2, w_2, h, eta)
 
 #########################
 # Affichage des résultats
@@ -121,3 +124,14 @@ print(f"\nLongueur 1 : {L_1*1e3:.2f} mm")
 print(f"Longueur 2 : {L_2*1e3:.2f} mm")
 print(f"Longueur 3 : {L_3*1e3:.2f} mm")
 print(f"Longueur 4 : {L_4*1e3:.2f} mm\n")
+
+# Vérification des ratios L_i / w_i > 10
+ratios = {
+    "L_1/w_1": L_1 / w_1,
+    "L_3/w_3": L_3 / w_3,
+    "L_4/w_4": L_4 / w_4,
+}
+
+print("Vérification des ratios L_i / w_i >= 10 :")
+for key, value in ratios.items():
+    print(f"{key} = {value:.2f} {'OK' if value >= 10 else 'NON'}")
