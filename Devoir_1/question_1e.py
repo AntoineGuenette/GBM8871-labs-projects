@@ -66,8 +66,6 @@ def simulation_t_chute(d: float, rho_part: float, rho_air: float, h: float, dt :
         # Calcul du pas de vitesse
         dv = (F_frot/m - g) * dt
 
-        # print("t:", t, "y:", y, "dv:", dv)
-
         # Lorsque la vitesse terminale est atteinte (donc lorsque dv proche de 0),
         # On peut calculer directement le temps restant pour la chute
         if abs(dv) < 1e-9 :
