@@ -14,7 +14,6 @@ d_part_1 = 0.5e-6 # Diamètre d'un noyau de gouttelette (m)
 d_part_2 = 500e-6 # Diamètre d'un postillon (m)
 
 h_bouche = 1.50 # Hauteur de la bouche (m)
-L = 2.00 # Distance considérée pour la règle de distanciation (m)
 
 v_max_x = 15.90 # Vitesse horizontale maximale d'expulsion de l'air lors d'un éternuemen (m.s^-1)
 g = 9.81 # Accélération gravitationnelle (m.s^-2)
@@ -77,7 +76,7 @@ t_part_2 = simulation_t_chute(d_part_2, rho_part, rho_air, h_bouche, dt=1e-5)
 
 print("\nPARTIE 1:")
 print(f"Temps de chute pour une particule de diamètre {d_part_1*1e6} µm : {t_part_1:.8f} s")
-print(f"Temps de chute pour une particule de diamètre {d_part_2*1e6} µm : {t_part_2:.8f} s\n")
+print(f"Temps de chute pour une particule de diamètre {d_part_2*1e6} µm : {t_part_2:.8f} s")
 
 ###############################################################
 # PARTIE 2 : Distance horizontale de pénétration des particules
@@ -96,8 +95,8 @@ def simulation_dist_penetration(d: float, rho_part: float, rho_air: float, v_max
     v = v_max # Vitesse (m.s^-1)
     x = 0 # Position (m)
 
-    # La vitesse ne sera jamais réellement nulle, donc ont considère la distance de pénétration
-    # comme la distance que la particule a parcouru lorsque sa vitesse est réduite de 99%
+    # La vitesse ne sera jamais réellement nulle, donc on considère la distance de pénétration
+    # comme étant la distance que la particule a parcouru lorsque sa vitesse est réduite de 99%
     while v >= 0.01*v_max:
         
         # Calcul du nombre de Reynolds
