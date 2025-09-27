@@ -75,7 +75,7 @@ def simulation_t_chute(d: float, rho_part: float, rho_air: float, h: float, dt=1
 t_part_1 = simulation_t_chute(d_part_1, rho_part, rho_air, h_bouche, dt=1e-5)
 t_part_2 = simulation_t_chute(d_part_2, rho_part, rho_air, h_bouche, dt=1e-5)
 
-print("\nQUESTION C:")
+print("\nPARTIE 1:")
 print(f"Temps de chute pour une particule de diamètre {d_part_1*1e6} µm : {t_part_1:.8f} s")
 print(f"Temps de chute pour une particule de diamètre {d_part_2*1e6} µm : {t_part_2:.8f} s\n")
 
@@ -96,6 +96,8 @@ def simulation_dist_penetration(d: float, rho_part: float, rho_air: float, v_max
     v = v_max # Vitesse (m.s^-1)
     x = 0 # Position (m)
 
+    # La vitesse ne sera jamais réellement nulle, donc ont considère la distance de pénétration
+    # comme la distance que la particule a parcouru lorsque sa vitesse est réduite de 99%
     while v >= 0.01*v_max:
         
         # Calcul du nombre de Reynolds
@@ -103,29 +105,27 @@ def simulation_dist_penetration(d: float, rho_part: float, rho_air: float, v_max
 
         if Re <= 1e-3:
             # Traînée de Stokes
-            F_frot = 6 * np.pi * eta_air * r * v
+            F_frot = - 6 * np.pi * eta_air * r * v
         else:
             # Calcul du coefficient de frottement
             C = calcul_C(Re)
             # Traînée quadratique
-            F_frot = np.sign(v) * 1/2 * C * rho_air * A * v**2
+            F_frot = - np.sign(v) * 1/2 * C * rho_air * A * v**2
 
         # Calcul du pas de vitesse
-        dv = -F_frot/m * dt
+        dv = F_frot/m * dt
 
         # Mise à jour des variables
         v += dv
         x += v * dt
         t += dt
-
-        print(dv, v, x, t, Re, F_frot)
     
     return x - v * dt
 
 dist_penetration_part_1 = simulation_dist_penetration(d_part_1, rho_part, rho_air, v_max_x, 1e-1)
 dist_penetration_part_2 = simulation_dist_penetration(d_part_2, rho_part, rho_air, v_max_x, 1e-1)
 
-print("\nQUESTION D:")
+print("\nPARTIE 2:")
 print(f"Distance de pénétration pour une particule de diamètre {d_part_1*1e6} µm : {dist_penetration_part_1:.8f} m")
 print(f"Distance de pénétration pour une particule de diamètre {d_part_2*1e6} µm : {dist_penetration_part_2:.8f} m\n")
 
