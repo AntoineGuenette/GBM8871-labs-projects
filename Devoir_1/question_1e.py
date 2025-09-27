@@ -4,8 +4,6 @@ import numpy as np
 # DONNÉES PHYSIQUES ET GÉOMÉTRIQUES
 ###################################
 
-# (L'ensemble des références utilisées pour les données est disponible dans le rapport)
-
 rho_part = 1007 # Masse volumique des particules (kg.m^-3)
 rho_air = 1.293 # Masse volumique de l'air (kg.m^-3)
 eta_air = 1.9e-5 # Viscosité dynamique de l'air (kg.m^-1.s^-1)
@@ -14,27 +12,29 @@ d_part_1 = 0.5e-6 # Diamètre d'un noyau de gouttelette (m)
 d_part_2 = 500e-6 # Diamètre d'un postillon (m)
 
 h_bouche = 1.50 # Hauteur de la bouche (m)
+distance_securiatire = 2.0 # Règle de distanciation sociale (m)
 
 v_max_x = 15.90 # Vitesse horizontale maximale d'expulsion de l'air lors d'un éternuemen (m.s^-1)
 g = 9.81 # Accélération gravitationnelle (m.s^-2)
-
-##############################################################
-# CALCUL DU NOMBRE DE REYNOLDS ET DU COEFFICIENT DE FROTTEMENT
-##############################################################
-
-def calcul_Re(rho: float, v: float, d: float, eta: float) -> float:
-    Re = (rho * np.abs(v) * d) / eta
-    return Re
-
-def calcul_C(Re: float) -> float:
-    C = 24 / Re + 4 / np.sqrt(Re) + 0.4
-    return C
 
 ##################################################
 # PARTIE 1 : CHUTE LIBRE DES PARTICULES DANS L'AIR
 ##################################################
 
 def simulation_t_chute(d: float, rho_part: float, rho_air: float, h: float, dt : int) -> float:
+    """
+    Simule la chute verticale d'une particule sphérique soumise à la gravité et aux forces de frottement.
+    
+    Args:
+        d (float): Diamètre de la particule (m).
+        rho_part (float): Masse volumique de la particule (kg/m^3).
+        rho_air (float): Masse volumique de l'air (kg/m^3).
+        h (float): Hauteur initiale (m).
+        dt (int): Pas de temps de la simulation (s).
+    
+    Returns:
+        float: Temps total de chute (s).
+    """
     
     # Calculs préliminaires
     r = d / 2 # Rayon de la particule (m)
@@ -47,18 +47,19 @@ def simulation_t_chute(d: float, rho_part: float, rho_air: float, h: float, dt :
     v = 0 # Vitesse (m.s^-1)
     y = h # Position (m)
 
-    while y>=0:
+    while y>0: # Arrêt de la simulation lorsque y ≤ 0
         
         # Calcul du nombre de Reynolds
-        Re = calcul_Re(rho_air, v, d, eta_air)
+        Re = (rho_air * np.abs(v) * d) / eta_air
 
-        # Pour des valeurs très petites de Re (Re << 1 donc Re < 0.1)
+        # Calcul de la force de frottement
+        # Pour des valeurs très petites de Re (Re << 1 c’est-à-dire Re < 0.1)
         if Re <= 1e-1:
             # Traînée de Stokes
             F_frot = -6 * np.pi * eta_air * r * v
         else:
             # Calcul du coefficient de frottement
-            C = calcul_C(Re)
+            C = 24 / Re + 4 / np.sqrt(Re) + 0.4
             # Traînée quadratique
             F_frot = -np.sign(v) * 1/2 * C * rho_air * A * v**2
 
@@ -77,26 +78,31 @@ def simulation_t_chute(d: float, rho_part: float, rho_air: float, h: float, dt :
             t += y / abs(v_terminal)
             return t
 
+        # Mise à jour des variables
         v += dv
         y += v * dt
         t += dt
     
     return t - dt
 
-print("\nPARTIE 1:")
-
-t_part_1 = simulation_t_chute(d_part_1, rho_part, rho_air, h_bouche, dt=1e-6)
-print(f"Temps de chute pour une particule de diamètre {d_part_1*1e6} µm : {t_part_1/3600:.2f} h")
-
-t_part_2 = simulation_t_chute(d_part_2, rho_part, rho_air, h_bouche, dt=1e-6)
-print(f"Temps de chute pour une particule de diamètre {d_part_2*1e6} µm : {t_part_2:.2f} s")
-
 ###############################################################
 # PARTIE 2 : Distance horizontale de pénétration des particules
 ###############################################################
 
 def simulation_dist_penetration(d: float, rho_part: float, rho_air: float, v_max: float, dt: int) -> float:
+    """
+    Simule la distance horizontale de pénétration d'une particule sphérique projetée horizontalement dans l'air.
     
+    Args:
+        d (float): Diamètre de la particule (m).
+        rho_part (float): Masse volumique de la particule (kg/m^3).
+        rho_air (float): Masse volumique de l'air (kg/m^3).
+        v_max (float): Vitesse initiale maximale horizontale (m/s).
+        dt (int): Pas de temps de la simulation (s).
+    
+    Returns:
+        float: Distance horizontale parcourue (m).
+    """
     # Calculs préliminaires
     r = d / 2 # Rayon de la particule (m)
     A = np.pi * r**2 # Section transversale de la particule (m^2)
@@ -114,15 +120,16 @@ def simulation_dist_penetration(d: float, rho_part: float, rho_air: float, v_max
     while v >= 0.01*v_max:
         
         # Calcul du nombre de Reynolds
-        Re = calcul_Re(rho_air, v, d, eta_air)
+        Re = (rho_air * np.abs(v) * d) / eta_air
 
-        # Pour des valeurs très petites de Re (Re << 1 donc Re < 0.1)
+        # Calcul de la force de frottement
+        # Pour des valeurs très petites de Re (Re << 1 c’est-à-dire Re < 0.1)
         if Re <= 1e-1:
             # Traînée de Stokes
             F_frot = - 6 * np.pi * eta_air * r * v
         else:
             # Calcul du coefficient de frottement
-            C = calcul_C(Re)
+            C = 24 / Re + 4 / np.sqrt(Re) + 0.4
             # Traînée quadratique
             F_frot = - np.sign(v) * 1/2 * C * rho_air * A * v**2
 
@@ -136,35 +143,61 @@ def simulation_dist_penetration(d: float, rho_part: float, rho_air: float, v_max
     
     return x - v * dt
 
-print("\nPARTIE 2:")
-
-dist_penetration_part_1 = simulation_dist_penetration(d_part_1, rho_part, rho_air, v_max_x, dt=1e-8)
-print(f"Distance de pénétration pour une particule de diamètre {d_part_1*1e6} µm : {dist_penetration_part_1*1e6:.2f} µm")
-
-dist_penetration_part_2 = simulation_dist_penetration(d_part_2, rho_part, rho_air, v_max_x, dt=1e-6)
-print(f"Distance de pénétration pour une particule de diamètre {d_part_2*1e6} µm : {dist_penetration_part_2:.2f} m")
-
 ##############################
 # PARTIE 3 : DIAMÈTRE CRITIQUE
 ##############################
 
-def diametre_critique(rho_part, rho_air, v_max_x, penetration_cible, dt=1e-6, tol=1e-6, max_iter=100):
+def diametre_critique(rho_part, rho_air, v_max_x, cible, dt=1e-6, tol=1e-6, max_iter=100):
+    """
+    Estime par recherche dichotomique le diamètre critique d'une particule sphérique
+    pour lequel la distance de pénétration correspond à une valeur cible.
+    
+    Args:
+        rho_part (float): Masse volumique de la particule (kg/m^3).
+        rho_air (float): Masse volumique de l'air (kg/m^3).
+        v_max_x (float): Vitesse initiale horizontale maximale (m/s).
+        cible (float): Distance de pénétration cible (m).
+        dt (float): Pas de temps de la simulation(s).
+        tol (float): Tolérance de convergence (m).
+        max_iter (int): Nombre maximal d'itérations.
+    
+    Returns:
+        float: Diamètre critique estimé (m).
+    """
+    # Plage de recherche (entre 500 um et 600um)
     d_min = 500e-6
     d_max = 600e-6
+
     for i in range(max_iter):
+        # Évaluation de la valeur centrale de la plage de recherche
         d_mid = 0.5 * (d_min + d_max)
         print(f"Simulation {i+1} en cours")
         dist = simulation_dist_penetration(d_mid, rho_part, rho_air, v_max_x, dt)
-        
-        if abs(dist - penetration_cible) < tol:
+        # Mise à jour de la plage de recherche selon la valeur obtenue
+        if abs(dist - cible) < tol:
             return d_mid
-        if dist < penetration_cible:
+        if dist < cible:
             d_min = d_mid
         else:
             d_max = d_mid
-        print(f"Estimation {i+1} : {d_mid*1e6:.2f} µm avec un écart de {100*abs(dist-penetration_cible)/dist:.4f} %")
+        print(f"Estimation {i+1} : {d_mid*1e6:.2f} µm avec un écart de {100*abs(dist-cible)/dist:.4f} %")
     return d_mid  # Retourne la meilleure estimation après max_iter
 
-print("\nPARTIE 3:")
-d_critique = diametre_critique(rho_part, rho_air, v_max_x, 2.0, dt=1e-6)
-print(f"Diamètre critique pour une distance de pénétration de 2m : {d_critique*1e6:.2f} µm\n")
+
+if __name__ == "__main__" :
+
+    print("\nPARTIE 1:")
+    t_part_1 = simulation_t_chute(d_part_1, rho_part, rho_air, h_bouche, dt=1e-6)
+    print(f"Temps de chute pour une particule de diamètre {d_part_1*1e6} µm : {t_part_1/3600:.2f} h")
+    t_part_2 = simulation_t_chute(d_part_2, rho_part, rho_air, h_bouche, dt=1e-6)
+    print(f"Temps de chute pour une particule de diamètre {d_part_2*1e6} µm : {t_part_2:.2f} s")
+
+    print("\nPARTIE 2:")
+    dist_penetration_part_1 = simulation_dist_penetration(d_part_1, rho_part, rho_air, v_max_x, dt=1e-8)
+    print(f"Distance de pénétration pour une particule de diamètre {d_part_1*1e6} µm : {dist_penetration_part_1*1e6:.2f} µm")
+    dist_penetration_part_2 = simulation_dist_penetration(d_part_2, rho_part, rho_air, v_max_x, dt=1e-6)
+    print(f"Distance de pénétration pour une particule de diamètre {d_part_2*1e6} µm : {dist_penetration_part_2:.2f} m")
+
+    print("\nPARTIE 3:")
+    d_critique = diametre_critique(rho_part, rho_air, v_max_x, cible=distance_securiatire)
+    print(f"Diamètre critique pour une distance de pénétration de 2m : {d_critique*1e6:.2f} µm\n")
