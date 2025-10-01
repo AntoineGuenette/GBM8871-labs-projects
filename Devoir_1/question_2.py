@@ -57,7 +57,7 @@ def calcul_resistance_solutionStokes(L, h=h, w=w):
     """Question B"""
     R_rect = (12 * eta * L) / (h**3 * w)
     somme = 1
-    for n_i in range(1, 10, 2):
+    for n_i in range(1, 100, 2):
         terme_somme = (192 * h) / (np.pi**5 * n_i**5 * w) * np.tanh(n_i * np.pi * w / (2 * h))
         somme -= terme_somme
     return R_rect / somme
@@ -92,13 +92,13 @@ def afficher_resultats(methode, nom=None):
     print(f'R2 = {R2:.3g}')
     print(f'R3 = {R3:.3g}')
 
-    Rtot = (
+    Req = (
         Re / 2
         + Rs * (1/4 + 1/5 + 1/3)
         + 1/(2/(Rs+R1) + 2/(Rs+R2) + 2/(Rs+R3))
         + Rd1 + Rd2 + Rd3
     )
-    print(f'Rtot = {Rtot:.3g}\n')
+    print(f'Req = {Req:.3g}\n')
 
 
 #########################
