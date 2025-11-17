@@ -36,9 +36,12 @@ A_outlet = np.pi * r_outlet**2
 # Caclul du volume total
 V_puits = L_puits * W_puits * h_puits
 V_raman = A_raman * h_puce
-
 V_inlet = A_inlet * h_canal
 V_outlet = A_outlet * h_canal
+print(f"\nVolume d'un puits : {V_puits*1e9:.2f} uL")
+print(f"Volume de raman : {V_raman*1e9:.2f} uL")
+print(f"Volume d'entrée : {V_inlet*1e9:.2f} uL")
+print(f"Volume de sortie : {V_outlet*1e9:.2f} uL")
 
 V_canal = W_canal * h_canal * (dist_tot - r_inlet - r_outlet)
 
