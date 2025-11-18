@@ -1,9 +1,9 @@
 import numpy as np
 
-h = 200e-6
+h = 500e-6
 w = 500e-6
 gamma = 72.9e-3
-theta_deg = 45
+theta_deg = 60
 theta = np.deg2rad(theta_deg)
 eta = 8.94e-4
 t = 10
