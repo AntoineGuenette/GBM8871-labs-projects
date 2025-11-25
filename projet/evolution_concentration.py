@@ -1,12 +1,15 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import os
 
 # Charger le fichier CSV (adapter le chemin si nécessaire)
-fichier = '/Users/Shared/COMSOL/GBM8871/Figures projet/Changement de milieu/concentrations.csv'
+script_dir = os.path.dirname(os.path.abspath(__file__))
+path_fichier = os.path.join(script_dir, "data", "concentrations.csv")
+
 
 # Lecture en ignorant les lignes de commentaires
 df = pd.read_csv(
-    fichier,
+    path_fichier,
     comment='%',
 )
 
@@ -31,7 +34,8 @@ nouvelle_ligne = pd.DataFrame({
 df = pd.concat([nouvelle_ligne, df], ignore_index=True)
 
 # Sauvegarder le CSV modifié
-df.to_csv("concentrations_modifie.csv", index=False)
+path_fichier_modifie = os.path.join(script_dir, "data", "concentrations_modifie.csv")
+df.to_csv(path_fichier_modifie, index=False)
 
 # Tracer le graphique
 plt.figure(figsize=(8, 5))
