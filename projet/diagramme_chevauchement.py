@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 # Valeurs et incertitudes
 values = {
     "Analogie électrique": (109.989, 8.603),   # valeur, incertitude
-    "Modélisation COMSOL": (115, 1),
+    "Modèle COMSOL": (115, 1),
     "Valeur expérimentale": (116, 0.8)
 }
 
@@ -24,7 +24,7 @@ ax.errorbar(
 )
 
 # Style
-ax.set_xlabel("Volume [uL]")
+ax.set_xlabel("Volume de débordement [uL]")
 ax.set_title("Diagramme de chevauchement")
 
 # Affichage de la plage min-max en arrière-plan
