@@ -2,11 +2,12 @@ import matplotlib.pyplot as plt
 
 # Valeurs et incertitudes
 values = {
-    "Valeur théorique": (109.989, 8.603),
+    "Valeur théorique": (110.441, 8.639),
     "Valeur simulée": (115, 0.5),
     "Valeur expérimentale": (116, 0.8)
 }
 
+# Création du diagramme de chevauchement
 labels = list(values.keys())
 means = [values[k][0] for k in labels]
 errors = [values[k][1] for k in labels]
