@@ -26,7 +26,7 @@ nouvelle_ligne = pd.DataFrame({
     "c0_puits_1_pct": [10],
     "c0_puits_2_pct": [10],
     "c0_puits_3_pct": [10],
-    "c0_systeme_pct": [10.5]
+    "c0_systeme_pct": [19.5]
 })
 df = pd.concat([nouvelle_ligne, df], ignore_index=True)
 
@@ -47,7 +47,7 @@ plt.plot(df["time_s"], df["c0_systeme_pct"], label="Système", color="tab:purple
 plt.axhline(y=95.5, color="red", linestyle="--", linewidth=2, label="Seuil de changement acceptable")
 
 # Lignes délimitant les changements de milieu
-for x in [0, 130, 260, 390]:
+for x in [0, 130, 260]:
     plt.axvline(x=x, color="gray", linestyle=":", linewidth=2)
 
 plt.xlabel("Temps (s)")
