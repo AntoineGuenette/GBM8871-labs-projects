@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 values = {
     "Valeur théorique": (110.441, 8.639),
     "Valeur simulée": (115, 0.5),
-    "Valeur expérimentale": (116, 0.8)
+    "Valeur expérimentale": (116, 1.3)
 }
 
 # Création du diagramme de chevauchement
